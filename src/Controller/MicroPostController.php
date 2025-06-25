@@ -33,7 +33,7 @@ final class MicroPostController extends AbstractController
 //        dd($posts->findAll());
 
         return $this->render('micro_post/index.html.twig', [
-            'posts' => $posts->findAll(),
+            'posts' => $posts->findAllWithComments(),
         ]);
     }
 
