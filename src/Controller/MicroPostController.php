@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Comment;
 use App\Entity\MicroPost;
+use App\Repository\CommentRepository;
+use App\Form\CommentTypeForm;
 use App\Repository\MicroPostRepository;
 use App\Form\MicroPostTypeForm;
 use DateTime;
@@ -108,5 +111,34 @@ final class MicroPostController extends AbstractController
         );
     }
 
-    
+#[Route('/micro-post/{post}/comment', name: 'app_micro_post_comment')]
+    public function addComment(EntityManagerInterface $em, MicroPost $post, Request $request, CommentRepository $comments): Response
+    {
+        $form = $this->createForm(CommentTypeForm::class, new Comment());
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $comment = $form->getData();
+            $comment->setPost($post);
+            $em->persist($comment);
+            $em->flush();
+
+            // Add a flash
+            $this->addFlash('success', 'Your comment have been updated.');
+
+            return $this->redirectToRoute(
+                'app_micro_post_show',
+                ['post' => $post->getId()]
+            );
+            // Redirect
+        }
+
+        return $this->render(
+            'micro_post/comment.html.twig',
+            [
+                'form' => $form,
+                'post' => $post
+            ]
+        );
+    }
 }
