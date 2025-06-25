@@ -13,9 +13,7 @@ class MicroPostTypeForm extends AbstractType
     {
         $builder
             ->add('title')
-            ->add('text')
-            ->add('created')
-        ;
+            ->add('text');
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -25,3 +23,4 @@ class MicroPostTypeForm extends AbstractType
         ]);
     }
 }
+
