@@ -15,6 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class MicroPostController extends AbstractController
 {
@@ -47,6 +48,7 @@ final class MicroPostController extends AbstractController
     }
 
     #[Route('/micro-post/add', name: 'app_micro_post_add', priority: 2)]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function add(Request $request, EntityManagerInterface $em): Response
     {
 //        $microPost = new MicroPost();
@@ -80,6 +82,7 @@ final class MicroPostController extends AbstractController
     }
 
     #[Route('/micro-post/{post}/edit', name: 'app_micro_post_edit')]
+    #[IsGranted('ROLE_EDITOR')]
     public function edit(MicroPost $post, Request $request, EntityManagerInterface $em): Response
     {
 //        $form = $this->createFormBuilder($post)
@@ -113,7 +116,8 @@ final class MicroPostController extends AbstractController
         );
     }
 
-#[Route('/micro-post/{post}/comment', name: 'app_micro_post_comment')]
+    #[Route('/micro-post/{post}/comment', name: 'app_micro_post_comment')]
+    #[IsGranted('ROLE_COMMENTER')]
     public function addComment(EntityManagerInterface $em, MicroPost $post, Request $request, CommentRepository $comments): Response
     {
         $form = $this->createForm(CommentTypeForm::class, new Comment());
