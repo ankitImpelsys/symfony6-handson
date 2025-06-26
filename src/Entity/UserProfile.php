@@ -7,7 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserprofileRepository::class)]
-class UserProfile
+class   UserProfile
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
