@@ -59,6 +59,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $isVerified = false;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTime $bannedUntil = null;
+
     public function __construct()
     {
         $this->liked = new ArrayCollection();
@@ -90,7 +93,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        return (string)$this->email;
     }
 
     /**
@@ -101,6 +104,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
+
+        if ($this->isVerified()) {
+            $roles[] = 'ROLE_WRITER';
+        }
 
         return array_unique($roles);
     }
@@ -251,6 +258,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsVerified(bool $isVerified): static
     {
         $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    public function getBannedUntil(): ?\DateTime
+    {
+        return $this->bannedUntil;
+    }
+
+    public function setBannedUntil(?\DateTime $bannedUntil): static
+    {
+        $this->bannedUntil = $bannedUntil;
 
         return $this;
     }
