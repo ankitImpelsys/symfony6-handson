@@ -39,9 +39,9 @@ class RegistrationForm extends AbstractType
                     'mapped' => false
                 ],
                 'second_options' => [
-        'label' => 'Repated password',
-        'mapped' => false
-    ],
+                    'label' => 'Repeated password',
+                    'mapped' => false
+                ],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Please enter a password',
@@ -54,7 +54,7 @@ class RegistrationForm extends AbstractType
                     ]),
                 ],
             ])
-        ;
+            ->add('userProfile', UserProfileTypeForm::class);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

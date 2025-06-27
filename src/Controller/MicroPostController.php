@@ -33,9 +33,12 @@ final class MicroPostController extends AbstractController
         // Show all posts
 //        dd($posts->findAll());
 
-        return $this->render('micro_post/index.html.twig', [
-            'posts' => $posts->findAllWithComments(),
-        ]);
+        return $this->render(
+            'micro_post/index.html.twig',
+            [
+                'posts' => $posts->findAllWithComments(),
+            ]
+        );
     }
 
     #[Route('/micro-post/{post}', name: 'app_micro_post_show')]
@@ -43,9 +46,12 @@ final class MicroPostController extends AbstractController
     //this method will only work if you have to fetch one data otherwise use the above method
     public function showOne(MicroPost $post): Response
     {
-        return $this->render('micro_post/show.html.twig', [
-            'post' => $post,
-        ]);
+        return $this->render(
+            'micro_post/show.html.twig',
+            [
+                'post' => $post,
+            ]
+        );
     }
 
     #[Route('/micro-post/add', name: 'app_micro_post_add', priority: 2)]
