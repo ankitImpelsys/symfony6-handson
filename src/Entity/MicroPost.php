@@ -12,6 +12,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: MicroPostRepository::class)]
 class MicroPost
 {
+
+
     public const EDIT = 'POST_EDIT';
     public const VIEW = 'POST_VIEW';
     #[ORM\Id]
@@ -46,11 +48,15 @@ class MicroPost
     #[ORM\ManyToOne(inversedBy: 'posts')]
     private ?User $author = null;
 
+    #[ORM\Column]
+    private ?bool $extraPrivacy = null;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
         $this->likedBy = new ArrayCollection();
         $this->created = new DateTime();
+        $this->extraPrivacy = false;
     }
 
 
@@ -157,6 +163,18 @@ class MicroPost
     public function setAuthor(?User $author): static
     {
         $this->author = $author;
+
+        return $this;
+    }
+
+    public function isExtraPrivacy(): ?bool
+    {
+        return $this->extraPrivacy;
+    }
+
+    public function setExtraPrivacy(bool $extraPrivacy): static
+    {
+        $this->extraPrivacy = $extraPrivacy;
 
         return $this;
     }

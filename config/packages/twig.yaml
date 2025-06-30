@@ -3,6 +3,9 @@ twig:
     form_themes:
         - 'form/fields.html.twig'
 
+    globals:
+        profiles: '%profiles%'
+
 when@test:
     twig:
         strict_variables: true
