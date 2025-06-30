@@ -9,10 +9,12 @@ use App\Repository\CommentRepository;
 use App\Form\CommentTypeForm;
 use App\Repository\MicroPostRepository;
 use App\Form\MicroPostTypeForm;
+use App\Repository\UserRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -156,8 +158,7 @@ final class MicroPostController extends AbstractController
         );
     }
 
-    #[
-        Route('/micro-post/{post}/comment', name: 'app_micro_post_comment')]
+    #[Route('/micro-post/{post}/comment', name: 'app_micro_post_comment')]
     #[IsGranted('ROLE_COMMENTER')]
     public function addComment(
         EntityManagerInterface $em,
@@ -195,4 +196,72 @@ final class MicroPostController extends AbstractController
             ]
         );
     }
+
+
+    #[Route('/api/micro-post', name: 'api_micro_post_list', methods: ['GET'])]
+    public function apiList(MicroPostRepository $posts): Response
+    {
+        $allPosts = $posts->findAll();
+
+        $data = [];
+
+        /** @var MicroPost $post */
+        foreach ($allPosts as $post) {
+            $commentsData = [];
+            foreach ($post->getComments() as $comment) {
+                $commentsData[] = [
+                    'id' => $comment->getId(),
+                    'text' => $comment->getText(),
+                    'author' => $comment->getAuthor()?->getEmail(),
+                    'created' => $comment->getCreated()?->format('Y-m-d H:i:s'),
+                ];
+            }
+
+            $data[] = [
+                'id' => $post->getId(),
+                'title' => $post->getTitle(),
+                'text' => $post->getText(),
+                'author' => $post->getAuthor()?->getEmail(),
+                'created' => $post->getCreated()?->format('Y-m-d H:i:s'),
+                'comments' => $commentsData,
+            ];
+        }
+
+        return $this->json($data);
+    }
+
+    #[Route('/savePost', name: 'save_post', methods: ['POST'])]
+    public function create(
+        Request $request,
+        MicroPostRepository $posts,
+        EntityManagerInterface $em,
+        UserRepository $userRepository
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+
+        // Just debug output for testing
+        // dd($data['author_id']);
+        //dd($data);
+
+        // Find the user by ID
+        $user = $userRepository->find($data['author_id']);
+        if (is_null($user)) {
+            return $this->json(['message' => 'Invalid user!!']);
+        }
+
+        // Create new post
+        $post = new MicroPost();
+        $post->setAuthor($user);
+        $post->setCreated(new DateTime());
+        $post->setText($data['text']);
+        $post->setTitle($data['title']);
+
+        // Save using repository
+        $em->persist($post);
+        $em->flush();
+
+        return $this->json(['message' => 'Post added!!']);
+    }
+
+
 }
